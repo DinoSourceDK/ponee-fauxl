@@ -1,0 +1,27 @@
+{
+  "title": "ASF Mailing List Archives",
+  "apiUrl": "/api",
+  "logo": "/asflogo.svg",
+  "gravatarUrl": "/api/gravatar?md5=%s",
+  "favoriteList": "dev",
+  "boringLists": [
+    "commits",
+    "cvs",
+    "site-cvs",
+    "security",
+    "notifications",
+    "issues"
+  ],
+  "subscribeLinks": false,
+  "permErrorPostface": "",
+  "defaults": {
+    "listmode": "threaded",
+    "compact": false,
+    "chatty": true,
+    "theme": "auto",
+    "showStatsSidebar": true,
+    "utc": false,
+    "homeView": "grid",
+    "uiStyle": "standard"
+  }
+}

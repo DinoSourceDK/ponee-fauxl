@@ -1,0 +1,11 @@
+{
+  "enabled": ["apache_oidc"],
+  "providers": {
+    "apache_oidc": {
+      "name": "Apache OpenID Connect",
+      "oauth_portal": "https://oauth.apache.org/oauth-oidc",
+      "oauth_token": "oidc"
+    }
+  },
+  "order": []
+}

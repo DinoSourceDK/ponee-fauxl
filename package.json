@@ -1,0 +1,30 @@
+{
+  "name": "ponymail-foal-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "license": "Apache-2.0",
+  "description": "Apache Pony Mail Foal - modern web frontend (Svelte + TypeScript + Vite + Tailwind CSS)",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^6.2.1",
+    "@tailwindcss/vite": "^4.1.16",
+    "@types/node": "^26.1.0",
+    "@types/swagger-ui-dist": "^3.30.6",
+    "svelte": "^5.42.2",
+    "svelte-check": "^4.3.3",
+    "tailwindcss": "^4.1.16",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.12",
+    "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "swagger-ui-dist": "^5.32.8"
+  }
+}
