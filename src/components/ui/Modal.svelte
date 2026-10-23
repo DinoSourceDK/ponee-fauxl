@@ -21,6 +21,11 @@
     open?: boolean;
     title?: string;
     wide?: boolean;
+    /**
+     * Close on Escape or a click on the backdrop. Turn off for modals
+     * holding unsaved input, so a stray key or click can't discard it.
+     */
+    dismissible?: boolean;
     onclose?: () => void;
     children: Snippet;
   }
@@ -29,6 +34,7 @@
     open = $bindable(false),
     title,
     wide = false,
+    dismissible = true,
     onclose,
     children,
   }: Props = $props();
@@ -56,6 +62,7 @@
   function onWindowKeydown(event: KeyboardEvent): void {
     if (!open) return;
     if (event.key === "Escape") {
+      if (!dismissible) return;
       event.preventDefault();
       close();
       return;
@@ -102,7 +109,7 @@
   <div
     class="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/50 p-4 dark:bg-slate-950/70"
     onclick={(event) => {
-      if (event.target === event.currentTarget) close();
+      if (dismissible && event.target === event.currentTarget) close();
     }}
   >
     <div

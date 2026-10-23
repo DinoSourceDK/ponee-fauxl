@@ -130,7 +130,14 @@
     "font-medium text-pony-600 hover:underline dark:text-pony-400";
 </script>
 
-<Modal bind:open={composer.open} onclose={closeComposer} wide {title}>
+<!-- Not dismissible: a stray Escape or click outside would discard the draft. -->
+<Modal
+  bind:open={composer.open}
+  onclose={closeComposer}
+  dismissible={false}
+  wide
+  {title}
+>
   {#if !session.credentials}
     {#if isReply}
       <p class="text-sm text-slate-700 dark:text-slate-300">
