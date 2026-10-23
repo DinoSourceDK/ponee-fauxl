@@ -92,7 +92,7 @@ function gitHash(): string {
 function apiSpec(): Plugin {
   let config: ResolvedConfig;
   const specPath = (): string =>
-    resolve(config.root, "../server/openapi.yaml");
+    resolve(config.root, "openapi.yaml");
   return {
     name: "ponymail-openapi-spec",
     configResolved(resolved) {

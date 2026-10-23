@@ -1,0 +1,970 @@
+
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  description: This is the API specifications for interacting with the Pony Mail (Foal) server backend
+  title: Apache Pony Mail Foal API
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+components:
+  schemas:
+    ActionResponse:
+      properties:
+        message:
+          description: Response text in human readable format
+          example: Email dispatched
+          type: string
+        okay:
+          description: Boolean indicating whether the desired action was completed or not
+          type: boolean
+          example: true
+      required:
+      - message
+      - okay
+    SearchRequest:
+      properties:
+        list:
+          description: The list part of the mailing list(s) to search. Can be * for wildcard search
+          example: dev
+          type: string
+        domain:
+          description: The domain part of the mailing list(s) to search.  Can be * for wildcard search
+          type: string
+          example: lists.example.org
+        date:
+          description: Optional year-month date to search within
+          type: string
+          example: "2020-08"
+        s:
+          description: Optional start year-month date to search from
+          type: string
+          example: "2019-01"
+        e:
+          description: Optional end year-month date to search to
+          type: string
+          example: "2021-12"
+        d:
+          description: |
+            Optional advanced date parameters. There are various options for specifying the date range:
+            - a single month: yyyy-mm
+            - gte (greater than or equal) or lte (less than or equal) a number of Months, weeks, years or days (Mwyd)
+            - dfr=yyyy-mm-dd|dto=yyy-mm-dd, a range of days (inclusive)
+          example: |
+            - "2019-01"
+            - "lte=10d", "gte=2y"
+            - "dfr=2021-9-21|dto=2021-10-31"
+          type: string
+        dfrom:
+          description: Optional start date, expressed as days ago. Used with dto.
+          type: string
+          example: 31
+        dto:
+          description: Optional start date, expressed as days to capture starting from dfrom
+          type: string
+          example: 10
+        q:
+          description: "Free text query to search for. Can use + or - to denote mandatory presence or absence of words"
+          type: string
+          example: "apples +oranges -bananas"
+        header_from:
+          description: "Optional From: header search for narrowing down results"
+          type: string
+          example: janedoe@example.org
+        header_subject:
+          description: "Optional Subject: header search for narrowing down results"
+          type: string
+          example: "weekly meeting on friday"
+        header_body:
+          description: "Optional body-only search parameters"
+          type: string
+          example: "This was a great idea"
+        header_to:
+          description: "Optional To: header search for narrowing down results"
+          type: string
+          example: janedoe@example.org
+        header_messageid:
+          description: "Optional Message-Id: header search for narrowing down results"
+          type: string
+          example: "<521062724.28.1506761839312.JavaMail.jenkins@unhygienix.ics.uci.edu>"
+      required:
+      - list
+      - domain
+    SingleEmailRequest:
+      properties:
+        id:
+          description: The ID (document id or message-id) of the email to fetch
+          example: "5wnbldtbbcog0p259jnhvqbkc7nhjt71"
+          type: string
+        listid:
+          description: The List ID the email must adhere to (only if searching by Message-ID header)
+          example: "<users.httpd.apache.org>"
+          type: string
+      required:
+      - id
+    SingleEmailResponse:
+      properties:
+        attachments:
+          description: List of attachments, if any
+          example: [TBA]
+          type: array
+        cc:
+          description: List of Cc email addresses
+          example: "\"announce@tomcat.apache.org\" <announce@tomcat.apache.org>, \"dev@tomcat.apache.org\" <dev@tomcat.apache.org>, announce@apache.org"
+          type: string
+        from:
+          description: The sender address of the email
+          example: "Asterix build server  <jenkins@asterix-jenkins.ics.uci.edu>"
+          type: string
+        from_raw:
+          description: The sender address of the email (unedited by Foal)
+          example: "Asterix build server  <jenkins@asterix-jenkins.ics.uci.edu>"
+          type: string
+        to:
+          description: The recipient address of the email
+          example: dev@asterixdb.apache.org
+          type: string
+        subject:
+          description: The email subject
+          example: "Jenkins build is still unstable: asterix-integration-tests ab8375ea"
+          type: string
+        message-id:
+          description: The original (user-provided) Message-ID of the email
+          example: "<521062724.28.1506761839312.JavaMail.jenkins@unhygienix.ics.uci.edu>"
+          type: string
+        id:
+          description: The internal document ID of the email
+          example: r8cmj7vm5n8z5r3xda5ebd
+          type: string
+        mid:
+          description: The internal document ID of the email (backwards compat item)
+          example: r8cmj7vm5n8z5r3xda5ebd
+          type: string
+        epoch:
+          description: The timestamp of the email in UNIX epoch format
+          example: 1506761839
+          type: integer
+        list:
+          description: The list-ID header value
+          example: "<dev.asterixdb.apache.org>"
+          type: string
+        list_raw:
+          description: The unedited list-ID header value
+          example: "<dev.asterixdb.apache.org>"
+          type: string
+        date:
+          description: The Datetime of the email
+          example: "2017/09/30 08:57:19"
+          type: string
+        private:
+          description: Whether the email is privately archived or not
+          example: false
+          type: boolean
+        references:
+          description: "The References: header of the email"
+          example: "<1538859253.27.1506747931378.JavaMail.jenkins@unhygienix.ics.uci.edu>"
+          type: string
+        in-reply-to:
+          description: "The In-Reply-To: header of the email"
+          example: "<1538859253.27.1506747931378.JavaMail.jenkins@unhygienix.ics.uci.edu>"
+          type: string
+        body:
+          description: The message body of the email
+          example: "I like cakes.\nThe joke you made really made me laugh.\nBest,\nJess."
+          type: string
+        body_short:
+          description: The message body of the email, truncated to 201 chars
+          example: "I like cakes.\nThe joke you made really made me laugh.\nBest,\nJess."
+          type: string
+        permalinks:
+          description: All IDs that this document is filed and accessible under
+          type: array
+          example: ["r8cmj7vm5n8z5r3xda5ebd","r67a4b2148dcb782e68da95e2601cce677ad9902ecc87d640508ed9be@<dev.asterixdb.apache.org>"]
+        dbid:
+          description: "The Unique (non-deduplicated) identifier for this email, SHA3-256 digest of the raw message"
+          example: "08c4e61930db221d869b186707c7177248d227d7372e8d1e4028880b9d214cf1"
+          type: string
+        gravatar:
+          description: The Gravatar ID (lowercased md5 digest of the sender address) of the sender
+          example: "69eea47c5083c2e4945a2704fc7b658c"
+          type: string
+    CompactEmailResponse:
+      properties:
+        from:
+          description: The sender address of the email
+          example: "Asterix build server  <jenkins@asterix-jenkins.ics.uci.edu>"
+          type: string
+        subject:
+          description: The email subject
+          example: "Jenkins build is still unstable: asterix-integration-tests ab8375ea"
+          type: string
+        message-id:
+          description: The original (user-provided) Message-ID of the email
+          example: "<521062724.28.1506761839312.JavaMail.jenkins@unhygienix.ics.uci.edu>"
+          type: string
+        id:
+          description: The internal document ID of the email
+          example: r8cmj7vm5n8z5r3xda5ebd
+          type: string
+        mid:
+          description: The internal document ID of the email (backwards compat item)
+          example: r8cmj7vm5n8z5r3xda5ebd
+          type: string
+        epoch:
+          description: The timestamp of the email in UNIX epoch format
+          example: 1506761839
+          type: integer
+        list:
+          description: The list-ID header value
+          example: "<dev.asterixdb.apache.org>"
+          type: string
+        list_raw:
+          description: The unedited list-ID header value
+          example: "<dev.asterixdb.apache.org>"
+          type: string
+        private:
+          description: Whether the email is privately archived or not
+          example: false
+          type: boolean
+        body:
+          description: The message body of the email, tuncated to 201 chars
+          example: "I like cakes.\nThe joke you made really made me laugh.\nBest,\nJess."
+          type: string
+        gravatar:
+          description: The Gravatar ID (lowercased md5 digest of the sender address) of the sender
+          example: "69eea47c5083c2e4945a2704fc7b658c"
+          type: string
+        children:
+          description: Any child emails (replies)
+          items:
+            $ref: '#/components/schemas/CompactEmailResponse'
+          example: []
+          type: array
+    ThreadResponse:
+      properties:
+        thread:
+          type: object
+          description: The thread as a nested dictionary
+          $ref: '#/components/schemas/CompactEmailResponse'
+        emails:
+          type: array
+          description: Every single email in the thread, as an array
+          items:
+            $ref: '#/components/schemas/CompactEmailResponse'
+    StatsResponse:
+      properties:
+        active_months:
+          description: List of months with activity
+          type: array
+          example:
+            - 
+              "2017-01": 1
+            - 
+              "2017-02": 1
+        firstYear:
+          description: The first year found in the search results
+          type: integer
+          example: 2018
+        firstMonth:
+          description: The first month found in the search results
+          type: integer
+          example: 1
+        lastYear:
+          description: The last (most recent) year found within the search results
+          type: integer
+          example: 2021
+        lastMonth:
+          description: The last (most recent) month found in the search results
+          type: integer
+          example: 11
+        hits:
+          description: The total number of emails found in this search
+          type: integer
+          example: 134
+        numparts:
+          description: The total number of participants (authors) within the search result
+          type: integer
+          example: 28
+        no_threads:
+          description: The total number of distinct threads found within the search results
+          type: integer
+          example: 35
+        emails:
+          description: The emails found in this search, as a list of CompactEmailResponse objects
+          type: array
+          items:
+            $ref: '#/components/schemas/CompactEmailResponse'
+        cloud:
+          description: Word cloud as a word=count dictionary
+          type: object
+          example:
+            foo: 25
+            bar: 10
+            baz: 4
+        participants:
+          description: The participants (authors) within the search results, ranked by number of emails authored
+          type: array
+          example:
+            - 
+              email: foo@bar.baz
+              name: FOo Bar
+              count: 10
+              gravatar: "4fa3f0e42e603e5ae1ab627d6690e365"
+            -
+              email: jane@doe.example.org
+              name: Jane Doe
+              count: 5
+              gravatar: "7ddfb840a4db40a01ac99d29e82267b0"
+        searchlist:
+          description: The raw List-ID (if any) of the search parameters
+          type: string
+          example: "<dev.lists.example.org>"
+        name:
+          description: The listname part of the search parameters
+          type: string
+          example: dev
+        domain:
+          description: The domain part of the search parameters
+          type: string
+          example: lists.example.org
+        list:
+          description: The full list, in human readable format, of the search parameters
+          type: string
+          example: dev@lists.example.org
+        searchParams:
+          description: The search parameters used in this search
+          type: object
+          example:
+            d: "gte=2018-01"
+            q: "i like cake"
+            list: dev
+            domain: lists.example.irg
+        thread_struct:
+          description: The threaded representation of the search results, as a list of threads
+          type: array
+          example:
+            -
+              children: []
+              tid: "1ng5htgrhkbzwzzb"
+              subject: "Errored: apache/httpd#1037 (trunk - bafd719)"
+              tsubject: "apache/httpd#1037 (trunk…_<dev.httpd.apache.org>"
+              epoch: 1596279300
+              nest: 1
+          unixtime:
+            description: The server time in UNIX epoch format
+            example: 1506761839
+            type: integer
+    StreamStarter:
+      properties:
+        id:
+          description: The internal document ID of the email
+          example: r8cmj7vm5n8z5r3xda5ebd
+          type: string
+        mid:
+          description: The internal document ID of the email (backwards compat item)
+          example: r8cmj7vm5n8z5r3xda5ebd
+          type: string
+        from:
+          description: The sender address of the email
+          example: "Jane Doe <jane@example.org>"
+          type: string
+        gravatar:
+          description: The Gravatar ID (lowercased md5 digest of the sender address) of the sender
+          example: "69eea47c5083c2e4945a2704fc7b658c"
+          type: string
+        epoch:
+          description: The timestamp of the email in UNIX epoch format
+          example: 1506761839
+          type: integer
+        subject:
+          description: The email subject
+          example: "[VOTE] Release Apache Foo 1.2.3"
+          type: string
+        list:
+          description: The mailing list address
+          example: "dev.example.org"
+          type: string
+        private:
+          description: Whether the email is privately archived or not
+          example: false
+          type: boolean
+        body:
+          description: The message body of the email, truncated to 250 chars (teaser)
+          example: "Hi all,\nPlease vote on releasing the following artifacts..."
+          type: string
+    StreamChild:
+      properties:
+        id:
+          description: The internal document ID of the email
+          example: r8cmj7vm5n8z5r3xda5ebd
+          type: string
+        mid:
+          description: The internal document ID of the email (backwards compat item)
+          example: r8cmj7vm5n8z5r3xda5ebd
+          type: string
+        from:
+          description: The sender address of the email
+          example: "Jane Doe <jane@example.org>"
+          type: string
+        gravatar:
+          description: The Gravatar ID (lowercased md5 digest of the sender address) of the sender
+          example: "69eea47c5083c2e4945a2704fc7b658c"
+          type: string
+        epoch:
+          description: The timestamp of the email in UNIX epoch format
+          example: 1506761923
+          type: integer
+        subject:
+          description: The email subject
+          example: "Re: [VOTE] Release Apache Foo 1.2.3"
+          type: string
+        list:
+          description: The mailing list address
+          example: "dev.example.org"
+          type: string
+        private:
+          description: Whether the email is privately archived or not
+          example: false
+          type: boolean
+        depth:
+          description: Nesting depth of this reply within the thread (root children are 1)
+          example: 1
+          type: integer
+    StreamRow:
+      properties:
+        tid:
+          description: The document ID of the thread's root email
+          example: r8cmj7vm5n8z5r3xda5ebd
+          type: string
+        subject:
+          description: The thread subject (from the root email)
+          example: "[VOTE] Release Apache Foo 1.2.3"
+          type: string
+        epoch:
+          description: The timestamp of the thread's root email in UNIX epoch format
+          example: 1506761839
+          type: integer
+        last_epoch:
+          description: The timestamp of the newest email anywhere in the thread
+          example: 1506772000
+          type: integer
+        replies:
+          description: Number of replies in the thread (excluding the root email)
+          example: 4
+          type: integer
+        participants:
+          description: Number of unique authors in the thread
+          example: 3
+          type: integer
+        upvotes:
+          description: Sum of social upvotes across the thread (0 when social data is unavailable or not requested)
+          example: 0
+          type: integer
+        last_from:
+          description: The sender address of the newest email in the thread, if resolvable
+          example: "John Roe <john@example.org>"
+          type: string
+        starter:
+          description: Summary of the thread's root email, including a body teaser
+          $ref: '#/components/schemas/StreamStarter'
+        children:
+          description: Flattened descendants of the root (for tree views), body-free, capped at 200 per thread
+          items:
+            $ref: '#/components/schemas/StreamChild'
+          type: array
+    StreamResponse:
+      properties:
+        mode:
+          description: The listing mode this response was produced for
+          example: threads
+          type: string
+        page:
+          description: Zero-based page number of this response
+          example: 0
+          type: integer
+        quant:
+          description: Rows per page used for slicing
+          example: 25
+          type: integer
+        sort:
+          description: The row order this response was sliced under
+          example: activity
+          type: string
+        social:
+          description: Whether per-thread upvote sums were computed; false means upvotes are uniformly 0 (no social support or social not requested)
+          example: false
+          type: boolean
+        list_stats:
+          description: Per-list breakdown of the searched window, keyed by list address, with matching email count (hits), unique authors (participants) and threads started (threads, 0 in emails mode)
+          example: {"dev@example.org": {"hits": 120, "participants": 14, "threads": 30}}
+          additionalProperties:
+            properties:
+              hits:
+                type: integer
+              participants:
+                type: integer
+              threads:
+                type: integer
+            type: object
+          type: object
+        lists:
+          description: Normalized List-IDs of a lists= request; null when list/domain was used
+          example: ["<dev.example.org>", "<users.example.org>"]
+          items:
+            type: string
+          nullable: true
+          type: array
+        total:
+          description: Total pageable rows (thread count in threads mode, email hits in emails mode)
+          example: 8308
+          type: integer
+        hits:
+          description: Total number of emails matching the search
+          example: 15001
+          type: integer
+        no_threads:
+          description: Total number of discussion threads (0 in emails mode)
+          example: 8308
+          type: integer
+        numparts:
+          description: Number of unique authors across the search results
+          example: 724
+          type: integer
+        firstYear:
+          description: The first year with matching activity
+          example: 2023
+          type: integer
+        firstMonth:
+          description: The first month (of firstYear) with matching activity
+          example: 9
+          type: integer
+        lastYear:
+          description: The last year with matching activity
+          example: 2025
+          type: integer
+        lastMonth:
+          description: The last month (of lastYear) with matching activity
+          example: 9
+          type: integer
+        active_months:
+          description: Map of YYYY-MM month keys to email counts
+          example: {"2025-08": 198, "2025-09": 114}
+          type: object
+        participants:
+          description: The top 10 most active authors in the search results
+          example: []
+          type: array
+          items:
+            type: object
+        searchlist:
+          description: The list searched, in List-ID format
+          example: "<dev.example.org>"
+          type: string
+        name:
+          description: The list part of the searched mailing list
+          example: dev
+          type: string
+        domain:
+          description: The domain part of the searched mailing list
+          example: example.org
+          type: string
+        list:
+          description: The full mailing list address searched
+          example: dev@example.org
+          type: string
+        searchParams:
+          description: Echo of the request parameters
+          example: {"list": "dev", "domain": "example.org", "mode": "threads"}
+          type: object
+        unixtime:
+          description: Server time at response generation, UNIX epoch
+          example: 1506772000
+          type: integer
+        cached:
+          description: Whether the listing was served from the server-side cache
+          example: false
+          type: boolean
+        rows:
+          description: One page of listing rows (StreamRow in threads mode, StreamStarter in emails mode)
+          items:
+            $ref: '#/components/schemas/StreamRow'
+          type: array
+    ErrorResponse:
+      properties:
+        okay:
+          description: Whether the action completed (will be false)
+          example: false
+          type: boolean
+        message:
+          description: Response text in human readable format
+          example: The requested action could not be completed...
+          type: string
+      required:
+      - error
+    EmailComposition:
+      properties:
+        to:
+          description: Recipient address
+          example: dev@lists.example.org
+          type: string
+        subject:
+          description: Email subject
+          type: string
+          example: "RE: advanced debugging"
+        body:
+          description: Email message body
+          type: string
+          example: |
+            I think this is a great idea.
+            Let's chat on Monday.
+            With regards, Charles.
+        references:
+          description: Message ID of email this reply references (if not direct reply)
+          type: string
+          example: "<foo1234@dev.lists.example.org>"
+        in-reply-to:
+          description: Message ID of the email this is a direct reply to (if any)
+          type: string
+          example: "<foo1234@dev.lists.example.org>"
+      required:
+      - to
+      - subject
+      - body
+  securitySchemes:
+    cookieAuth:
+      in: cookie
+      name: ponymail
+      type: apiKey
+paths:
+  /api/compose.json:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailComposition'
+        description: Email details
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionResponse'
+          description: 200 response
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unexpected error
+      summary: Compose and dispatch an email to a list
+      security:
+      - cookieAuth: []
+  /api/email.json:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SingleEmailRequest'
+        description: Email details
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleEmailResponse'
+          description: 200 Response
+        '404':
+          content:
+            text/plain:
+              example: "Email not found!"
+          description: 404 response if email not found
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: unexpected error
+      security:
+      - cookieAuth: []
+      summary: Fetches a single email and returns it as a JSON object
+  /api/mbox.json:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequest'
+        description: Search parameters
+        required: true
+      responses:
+        '200':
+          content:
+            text/plain:
+              example: "[mbox file contents]"
+          description: 200 Response
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: unexpected error
+      security:
+      - cookieAuth: []
+      summary: Returns a list or a search result in mbox file format
+  # /api/mgmt.json:
+  #   TBA
+  # /api/oauth.json:
+  #   TBA
+  # /api/pminfo.json:
+  #   TBA
+  # /api/preferences.json:
+  #   TBA
+  /api/source.json:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SingleEmailRequest'
+        description: Email details
+        required: true
+      responses:
+        '200':
+          content:
+            text/plain:
+              example: |
+                From dev-return-5233-apmail-asterixdb-dev-archive=asterixdb.apache.org@asterixdb.apache.org  Sat Sep 30 08:58:08 2017
+                Return-Path: <dev-return-5233-apmail-asterixdb-dev-archive=asterixdb.apache.org@asterixdb.apache.org>
+                Received: (qmail 50072 invoked by uid 500); 30 Sep 2017 08:58:08 -0000
+                Mailing-List: contact dev-help@asterixdb.apache.org; run by ezmlm
+                Precedence: bulk
+                List-Help: <mailto:dev-help@asterixdb.apache.org>
+                List-Unsubscribe: <mailto:dev-unsubscribe@asterixdb.apache.org>
+                List-Post: <mailto:dev@asterixdb.apache.org>
+                List-Id: <dev.asterixdb.apache.org>
+                Reply-To: dev@asterixdb.apache.org
+                Delivered-To: mailing list dev@asterixdb.apache.org
+                Received: (qmail 50057 invoked by uid 99); 30 Sep 2017 08:58:07 -0000
+                Received: from pnap-us-west-generic-nat.apache.org (HELO spamd3-us-west.apache.org) (209.188.14.142)
+                    by apache.org (qpsmtpd/0.29) with ESMTP; Sat, 30 Sep 2017 08:58:07 +0000
+                Received: from localhost (localhost [127.0.0.1])
+                	by spamd3-us-west.apache.org (ASF Mail Server at spamd3-us-west.apache.org) with ESMTP id 3A2C21808B9
+                	for <dev@asterixdb.apache.org>; Sat, 30 Sep 2017 08:58:07 +0000 (UTC)
+                X-Virus-Scanned: Debian amavisd-new at spamd3-us-west.apache.org
+                X-Spam-Flag: NO
+                X-Spam-Score: 1.5
+                X-Spam-Level: *
+                X-Spam-Status: No, score=1.5 tagged_above=-999 required=6.31
+                	tests=[KAM_LAZY_DOMAIN_SECURITY=1, KAM_LINKBAIT=0.5,
+                	RP_MATCHES_RCVD=-0.001, URIBL_BLOCKED=0.001] autolearn=disabled
+                Received: from mx1-lw-us.apache.org ([10.40.0.8])
+                	by localhost (spamd3-us-west.apache.org [10.40.0.10]) (amavisd-new, port 10024)
+                	with ESMTP id 3VgxbDG3zW9E for <dev@asterixdb.apache.org>;
+                	Sat, 30 Sep 2017 08:58:06 +0000 (UTC)
+                Received: from unhygienix.ics.uci.edu (unhygienix.ics.uci.edu [128.195.14.130])
+                	by mx1-lw-us.apache.org (ASF Mail Server at mx1-lw-us.apache.org) with ESMTP id 4D7025FCC1
+                	for <dev@asterixdb.apache.org>; Sat, 30 Sep 2017 08:58:06 +0000 (UTC)
+                Received: from obelix.ics.uci.edu (localhost [127.0.0.1])
+                	by unhygienix.ics.uci.edu (Postfix) with ESMTP id 539A4240E6E;
+                	Sat, 30 Sep 2017 01:57:19 -0700 (PDT)
+                Date: Sat, 30 Sep 2017 01:57:19 -0700 (PDT)
+                From: Asterix build server  <jenkins@asterix-jenkins.ics.uci.edu>
+                To: dev@asterixdb.apache.org
+                Message-ID: <521062724.28.1506761839312.JavaMail.jenkins@unhygienix.ics.uci.edu>
+                In-Reply-To: <1538859253.27.1506747931378.JavaMail.jenkins@unhygienix.ics.uci.edu>
+                References: <1538859253.27.1506747931378.JavaMail.jenkins@unhygienix.ics.uci.edu>
+                Subject: Jenkins build is still unstable: asterix-integration-tests ab8375ea
+                MIME-Version: 1.0
+                Content-Type: text/plain; charset=UTF-8
+                Content-Transfer-Encoding: 7bit
+                X-Instance-Identity: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0nz/YYRm0UEuhP+TWwX2ST1fizEpF7HpM4sPcYz2NS87f/HwLueejqBmJC4+jeepHXZ+Jv8mx/RZqsiFpmGNadfrVj5xdvYYYhL+LX6IsquitcGo4czObwwWQ3wInopyASEIqxRi7J6UytN3Fsh6s61qMC7piY42C6FKuqDH3vbnDkTLc8SDdMT9gWSyP9hQTcqcZ76QizLXas6NwvHmUjtNTpxcEsiEcY41b9rUv3810LUs6FQymbPzyZPhTmcRS8841AjfVUbWiSc3ElmKHNxrFA2JmK5S1/xyEeESEaeYHT7daGi2aR1P2G9XtRj5Oj4n7dKo/Xo3cznIN3NNtQIDAQAB
+                X-Jenkins-Job: asterix-integration-tests
+                X-Jenkins-Result: UNSTABLE
+                
+                See <https://asterix-jenkins.ics.uci.edu/job/asterix-integration-tests/changes>
+          description: 200 Response
+        '404':
+          content:
+            text/plain:
+              example: "Email not found!"
+          description: 404 response if email not found
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: unexpected error
+      security:
+      - cookieAuth: []
+      summary: Fetches the raw mbox source of an email
+  /api/stats.json:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequest'
+        description: Search parameters
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsResponse'
+          description: 200 Response
+        '500':
+          content:
+            text/plain:
+              example: "The search could not be completed"
+      security:
+      - cookieAuth: []
+      summary: Searches the archives and returns the results that match
+  /api/stream.json:
+    get:
+      parameters:
+      - name: list
+        in: query
+        description: The list part of the mailing list(s) to search. Can be * for wildcard search. Required unless lists is given
+        required: false
+        schema:
+          type: string
+          example: dev
+      - name: domain
+        in: query
+        description: The domain part of the mailing list(s) to search. Can be * for wildcard search. Required unless lists is given
+        required: false
+        schema:
+          type: string
+          example: example.org
+      - name: lists
+        in: query
+        description: Comma-separated List-IDs to collate results across, replacing the list/domain pair. Accepts <dev.example.org>, dev.example.org and dev@example.org forms (up to 64)
+        required: false
+        schema:
+          type: string
+          example: "<dev.example.org>,<users.example.org>"
+      - name: mode
+        in: query
+        description: "Listing mode: one row per discussion thread, or one row per email"
+        required: false
+        schema:
+          type: string
+          enum: [threads, emails]
+          default: threads
+      - name: sort
+        in: query
+        description: Row order (threads mode only). Newest activity, most upvotes or most replies first; ties break on newest activity. upvotes implies social=yes
+        required: false
+        schema:
+          type: string
+          enum: [activity, upvotes, replies]
+          default: activity
+      - name: page
+        in: query
+        description: Zero-based page number
+        required: false
+        schema:
+          type: integer
+          default: 0
+      - name: quant
+        in: query
+        description: Rows per page (clamped to 1-100)
+        required: false
+        schema:
+          type: integer
+          default: 25
+      - name: d
+        in: query
+        description: Optional date specification (YYYY-M month, lte=1M style relative spans, or dfr=Y-M-D|dto=Y-M-D ranges)
+        required: false
+        schema:
+          type: string
+          example: 2025-9
+      - name: q
+        in: query
+        description: Optional free-text query (words are ANDed, +required, -excluded, "phrases")
+        required: false
+        schema:
+          type: string
+      - name: header_from
+        in: query
+        description: Optional phrase match on the from header
+        required: false
+        schema:
+          type: string
+      - name: header_subject
+        in: query
+        description: Optional phrase match on the subject header
+        required: false
+        schema:
+          type: string
+      - name: header_to
+        in: query
+        description: Optional phrase match on the to header
+        required: false
+        schema:
+          type: string
+      - name: header_body
+        in: query
+        description: Optional phrase match on the body
+        required: false
+        schema:
+          type: string
+      - name: header_messageid
+        in: query
+        description: Optional phrase match on the message-id header
+        required: false
+        schema:
+          type: string
+      - name: social
+        in: query
+        description: Set to "yes" to include per-thread upvote sums where the backend supports social data
+        required: false
+        schema:
+          type: string
+          enum: [yes]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StreamResponse'
+          description: One page of listing rows plus search-wide statistics
+        '400':
+          content:
+            text/plain:
+              example: "You must specify both a list and a domain parameter"
+          description: Missing or invalid parameters
+      security:
+      - cookieAuth: []
+      summary: Paged, transfer-optimized archive listing (the same results as stats.json, one page at a time; POST with the same parameters also works)
+  /api/thread.json:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SingleEmailRequest'
+        description: Email details
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadResponse'
+          description: 200 Response
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: unexpected error
+      security:
+      - cookieAuth: []
+      summary: Fetches an email thread based on a parent email
