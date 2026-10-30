@@ -111,7 +111,7 @@
   >
     {SOFTWARE_VERSION}.
     Apache Pony Mail is a trademark of the <a href="https://www.apache.org/">Apache Software Foundation</a>.
-    PonEE Fauxl is a third party front-end for the Pony Mail interface.
+    PonEE Fauxl is a third party interface for the Pony Mail API.
     UI issues can be filed at our <a href="https://github.com/DinoSourceDK/ponee-fauxl">GitHub repository</a>.
     <span aria-hidden="true">&middot;</span>
     <a href="/apidocs.html" class="hover:text-slate-600 hover:underline dark:hover:text-slate-300">
